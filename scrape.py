@@ -5,7 +5,7 @@ import csv
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-num_iters = 10
+num_iters = 2
 itercount = 1
 for i in range(num_iters):
 	browser = webdriver.Chrome()
