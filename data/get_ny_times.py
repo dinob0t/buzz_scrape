@@ -1,6 +1,8 @@
 import json
 import urllib2
 import time
+from datetime import date
+from dateutil.rrule import rrule, DAILY
 
 class NYTimesScraper():
     def __init__(self, apikey):
@@ -30,6 +32,10 @@ class NYTimesScraper():
         # load the JSON data and return it
         return json.loads(data)
 
+
+
+
+
 # Own method for counting unique items in csv file
 def count_items(col_num, csv_file):
     col_num = col_num -1
@@ -48,96 +54,54 @@ def count_items(col_num, csv_file):
 # set API key
 nytimes = NYTimesScraper(apikey='3af7a458fcd2dfdafbac6e909b589681:10:69478982')
 # Set number of pages to return
-pages = 500
+pages = 0
 
 # Set up CSV to write to
 filename = 'nytimesdata.csv'
-writer = open(filename, 'a')
+writer = open(filename, 'w')
 # Write the header
 # writer.write('"LASTNAME","PUB_"DATE","SECTION_NAME","WORD_COUNT","SOURCE","URL"\n')
 # writer.write('HEADLINE \n')
 
 count = 0
+a = date(2014, 1, 1)
+b = date(2014, 7, 7)
+print a, b
+date_list = []
+for dt in rrule(DAILY, dtstart=a, until=b):
+    date_list.append(dt.strftime("%Y%m%d"))
 
 # iterate over the pages
-for page in range(pages):
-    time.sleep(0.5)
-
-    # perform search and get article results
-    articles = nytimes.search({'begin_date': '20140101', 
-        'end_date': '20140601',
-        'fl': 'headline,source',
-        'page': str(page)})
-
-    #Show how many results
-    if page==0:
-        total_hits = articles['response']['meta']['hits']  
-        print total_hits, ' results found'
-
-    #break out when have seen all responses to save on requests    
-    if (page)*10 > total_hits:
-        break
-    # iterate over articles from response/docs
-    for article in articles['response']['docs']:
-        if article['source']:
-            if article['source'] == 'The New York Times':
-                if article['headline']:
-                    
-                    results_str = str(article['headline']['main'].encode('utf-8')) + ' \n'
-                    writer.write(results_str)
-                    count += 1
-                    print str(article['headline']['main'].encode('utf-8')), 'count number: ', count
-
-                     
-        # store each field in results string
-        # results_str = ""
-        # add each field after checking that it exists
-        # if article ['byline'] and article['byline']['person'] and 'lastname' in article['byline']['person'][0].keys():
-        #     results_str += '"' + article['byline']['person'][0]['lastname'] + '",'
-        # else:
-        #     results_str += '"UNKNOWN AUTHOR",'
-
-        # if article['pub_date']:
-        #     results_str += '"' + article['pub_date'] + '",'
-        # else:
-        #     results_str += '"UNKNOWN PUB DATE",'
-
-        # if article['section_name']:
-        #     results_str += '"' + article['section_name'] + '",'
-        # else:
-        #     results_str += '"UNKNOWN SECTION NAME",'
-
-        # if article['word_count']:
-        #     results_str += '"' + article['word_count'] + '",'
-        # else:
-        #     results_str += '"UNKNOWN WORD COUNT",'
-
-        # if article['source']:
-        #     results_str += '"' + article['source']  + '",'
-        # else:
-        #     results_str += '"UNKNOWN SOURCE",' 
-        # # final part of string writes new line
-        # if article['web_url']:
-        #     results_str += '"' + article['web_url'] + '"\n"'
-        # else:
-        #     results_str += '"UNKNOWN URL"\n'
-
-        
-        # write out this result
-        
+for page in range(pages+1):
 
 
-# print count_items(5, 'nytimesdata.csv')
+    for date_str in date_list:
 
-#1. Most recent article on missing plane 
-#2014-06-09 - yes still in the media
-#First article
-#2014-03-07
 
-#2. Using 'print count_items(5, 'nytimesdata.csv')'
-# shows that 'AP' gave the most source material
-# {'"SOURCE"': 1, '"AP"': 135, '"The New York Times"': 110, '"Reuters"': 14}
+        time.sleep(0.5)
 
-# Since I'm new here in New York, I would like to use
-# the yelp API to find good coffee. Looks like there
-# are plenty of python wrappers out there already 
+        # perform search and get article results
+        articles = nytimes.search({'begin_date': date_str, 
+            'end_date': date_str,
+            'fl': 'headline,type_of_material',
+            'page': str(page)})
+
+        #Show how many results
+        if page==0:
+            total_hits = articles['response']['meta']['hits']  
+            print total_hits, ' results found'
+
+        #break out when have seen all responses to save on requests    
+        if (page)*10 > total_hits:
+            break
+        # iterate over articles from response/docs
+        for article in articles['response']['docs']:
+            if article['type_of_material']:
+                if article['type_of_material'] == 'News':
+                    if article['headline']:
+                
+                        results_str = str(article['headline']['main'].encode('utf-8')) + ' \n'
+                        writer.write(results_str)
+                        count += 1
+                        print str(article['headline']['main'].encode('utf-8')), 'count number: ', count
+
