@@ -5,7 +5,7 @@ import csv
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-num_iters = 2
+num_iters = 1
 itercount = 1
 for i in range(num_iters):
 	browser = webdriver.Chrome()
@@ -70,5 +70,6 @@ for i in range(num_iters):
 		writer.writerow(number_list)
 	print 'Iteration number ', itercount
 	itercount +=1
+	print len(text_dict)
 
 	time.sleep(random.random())
