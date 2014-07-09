@@ -64,7 +64,7 @@ writer = open(filename, 'w')
 # writer.write('HEADLINE \n')
 
 count = 0
-a = date(2014, 1, 1)
+a = date(2013, 1, 1)
 b = date(2014, 7, 7)
 print a, b
 date_list = []
