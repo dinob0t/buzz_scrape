@@ -54,18 +54,18 @@ def count_items(col_num, csv_file):
 # set API key
 nytimes = NYTimesScraper(apikey='3af7a458fcd2dfdafbac6e909b589681:10:69478982')
 # Set number of pages to return
-pages = 0
+pages = 10
 
 # Set up CSV to write to
 filename = 'nytimesdata.csv'
-writer = open(filename, 'w')
+writer = open(filename, 'a')
 # Write the header
 # writer.write('"LASTNAME","PUB_"DATE","SECTION_NAME","WORD_COUNT","SOURCE","URL"\n')
 # writer.write('HEADLINE \n')
 
 count = 0
-a = date(2013, 1, 1)
-b = date(2014, 7, 7)
+a = date(2014, 6, 1)
+b = date(2014, 8, 19)
 print a, b
 date_list = []
 for dt in rrule(DAILY, dtstart=a, until=b):
@@ -83,7 +83,7 @@ for page in range(pages+1):
         # perform search and get article results
         articles = nytimes.search({'begin_date': date_str, 
             'end_date': date_str,
-            'fl': 'headline,type_of_material',
+            # 'fl': 'headline,type_of_material,print_page',
             'page': str(page)})
 
         #Show how many results
@@ -96,12 +96,15 @@ for page in range(pages+1):
             break
         # iterate over articles from response/docs
         for article in articles['response']['docs']:
+            # print article
             if article['type_of_material']:
                 if article['type_of_material'] == 'News':
-                    if article['headline']:
-                
-                        results_str = str(article['headline']['main'].encode('utf-8')) + ' \n'
-                        writer.write(results_str)
-                        count += 1
-                        print str(article['headline']['main'].encode('utf-8')), 'count number: ', count
+                    if article['section_name']:
+                        if article['section_name'] == 'U.S.' or article['section_name'] == 'World' or article['section_name'] == 'Opinion' or article['section_name'] == 'Science' or article['section_name'] =='Business Day':
+                            if article['headline']:
+                        
+                                results_str = str(article['headline']['main'].encode('utf-8')) + ' \n'
+                                writer.write(results_str)
+                                count += 1
+                                print str(article['headline']['main'].encode('utf-8')), 'count number: ', count
 
